@@ -2,7 +2,7 @@
 <html lang="en-US">
 <head>
     <meta charset="utf-8">
-    <title>Login</title>
+    <title>Administrator Sign In</title>
 </head>
 <body>
     <div id="login">

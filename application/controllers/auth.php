@@ -16,7 +16,7 @@ class Auth extends CI_Controller
 		}
 		else
 		{
-			$this->load->view('home');
+			$this->load->view('menu');
 		}
 	}
 	

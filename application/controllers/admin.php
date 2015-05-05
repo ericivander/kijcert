@@ -19,6 +19,34 @@ class Admin extends CI_Controller
 	{
 		$this->load->view('admin/menu');
 	}
+	
+	function request()
+	{
+		$this->load->model('request');
+		$data['request'] = $this->request->getRequest();
+		$this->load->view('admin/menu');
+		$this->load->view('admin/request', $data);
+	}
+	
+	function generateCSR()
+	{
+		$this->load->model('request');
+		$request = $this->request->getRequest();
+	}
+	
+	function generateCA()
+	{
+		
+	}
+	
+	function acceptRequest($id_request)
+	{
+		$this->generateCSR();
+		$this->generateCA();
+		$this->load->model('request');
+		$this->request->acceptRequest($id_request);
+		$this->request();
+	}
 }
 
 /* End of file admin.php */

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: May 05, 2015 at 05:46 AM
+-- Generation Time: May 05, 2015 at 11:57 AM
 -- Server version: 5.6.21
 -- PHP Version: 5.6.3
 
@@ -76,30 +76,20 @@ CREATE TABLE IF NOT EXISTS `csr` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `detail_request`
---
-
-CREATE TABLE IF NOT EXISTS `detail_request` (
-`id_detail` int(11) NOT NULL,
-  `organization_name` varchar(50) NOT NULL,
-  `address` varchar(128) NOT NULL,
-  `city` varchar(50) NOT NULL,
-  `postal_code` varchar(20) NOT NULL,
-  `id_country` varchar(2) NOT NULL,
-  `id_request` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `request`
 --
 
 CREATE TABLE IF NOT EXISTS `request` (
 `id_request` int(11) NOT NULL,
+  `serial_number` varchar(50) NOT NULL,
   `common_name` varchar(50) NOT NULL,
+  `organization_name` varchar(50) NOT NULL,
+  `address` varchar(128) NOT NULL,
+  `city` varchar(50) NOT NULL,
+  `postal_code` varchar(20) NOT NULL,
   `status` tinyint(1) NOT NULL,
-  `username` varchar(50) NOT NULL
+  `username` varchar(50) NOT NULL,
+  `id_country` varchar(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -149,16 +139,10 @@ ALTER TABLE `csr`
  ADD PRIMARY KEY (`id_csr`), ADD KEY `fk_csr_req` (`id_request`);
 
 --
--- Indexes for table `detail_request`
---
-ALTER TABLE `detail_request`
- ADD PRIMARY KEY (`id_detail`), ADD KEY `fk_detail_req` (`id_request`), ADD KEY `fk_detail_country` (`id_country`);
-
---
 -- Indexes for table `request`
 --
 ALTER TABLE `request`
- ADD PRIMARY KEY (`id_request`), ADD KEY `fk_req_user` (`username`);
+ ADD PRIMARY KEY (`id_request`), ADD KEY `fk_req_user` (`username`), ADD KEY `fk_request_country` (`id_country`);
 
 --
 -- Indexes for table `user_account`
@@ -181,11 +165,6 @@ MODIFY `id_cert` int(11) NOT NULL AUTO_INCREMENT;
 ALTER TABLE `csr`
 MODIFY `id_csr` int(11) NOT NULL AUTO_INCREMENT;
 --
--- AUTO_INCREMENT for table `detail_request`
---
-ALTER TABLE `detail_request`
-MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT;
---
 -- AUTO_INCREMENT for table `request`
 --
 ALTER TABLE `request`
@@ -207,17 +186,11 @@ ALTER TABLE `csr`
 ADD CONSTRAINT `fk_csr_req` FOREIGN KEY (`id_request`) REFERENCES `request` (`id_request`);
 
 --
--- Constraints for table `detail_request`
---
-ALTER TABLE `detail_request`
-ADD CONSTRAINT `fk_detail_country` FOREIGN KEY (`id_country`) REFERENCES `country` (`id_country`),
-ADD CONSTRAINT `fk_detail_req` FOREIGN KEY (`id_request`) REFERENCES `request` (`id_request`);
-
---
 -- Constraints for table `request`
 --
 ALTER TABLE `request`
-ADD CONSTRAINT `fk_req_user` FOREIGN KEY (`username`) REFERENCES `user_account` (`username`);
+ADD CONSTRAINT `fk_req_user` FOREIGN KEY (`username`) REFERENCES `user_account` (`username`),
+ADD CONSTRAINT `fk_request_country` FOREIGN KEY (`id_country`) REFERENCES `country` (`id_country`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

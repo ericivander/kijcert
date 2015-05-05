@@ -2,7 +2,7 @@
 <html lang="en-US">
 <head>
     <meta charset="utf-8">
-    <title>Login</title>
+    <title>Menu</title>
 </head>
 <body>
 	<h2>Home</h2>
