@@ -1,5 +1,9 @@
 <?php
 	
+include('File/X509.php');
+include('Crypt/RSA.php');
+
+
 class User extends CI_Controller
 {
 	function __construct()
@@ -61,7 +65,44 @@ class User extends CI_Controller
 		
 		$this->load->model('request');
 		$this->request->submitRequest($data);
+		$privKey = new Crypt_RSA();
+		extract($privKey->createKey());
+		$privKey->loadKey($privatekey);
+
+		$x509 = new File_X509();
+		$x509->setPrivateKey($privKey);
+		$x509->setDNProp('id-at-serialNumber', $serial_number);
+		$x509->setDNProp('id-at-commonName', $common_name);
+		$x509->setDNProp('id-at-organizationName', $organization_name);
+		$x509->setDNProp('id-at-streetAddress', $address);
+		$x509->setDNProp('id-at-localityName', $city);
+		$x509->setDNProp('id-at-postalCode', $postal_code);
+		$x509->setDNProp('id-at-countryName', $id_country);
 		
+
+		$csr = $x509->signCSR();
+
+		//secho $x509->saveCSR($csr);
+		$filecsr = $x509->saveCSR($csr);
+		$myfile = fopen($organization_name.'.txt',"w") or die("Unable to open file!");
+		fwrite($myfile, $filecsr);
+		fclose($myfile);
+
+
+		$file = $organization_name.'.txt';
+
+		if (file_exists($file)) 
+		{
+			header('Content-Description: File Transfer');
+			header('Content-Type: application/octet-stream');
+			header('Content-Disposition: attachment; filename='.basename($file));
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate');
+			header('Pragma: public');
+			header('Content-Length: ' . filesize($file));
+			readfile($file);
+			exit;
+		}
 		$this->index();
 		//echo "Certificate for " . $common_name . ", requested by " . $username;
 	}
