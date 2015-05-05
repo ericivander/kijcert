@@ -170,7 +170,7 @@ class User extends CI_Controller
 		foreach($filedata as $temp)
 			$filecert = $temp->cert;
 		
-		$myfile = fopen($id_request.'.cert',"w") or die("Unable to open file!");
+		$myfile = fopen($id_request.'.cer',"w") or die("Unable to open file!");
 		fwrite($myfile, $filecert);
 		fclose($myfile);
 
