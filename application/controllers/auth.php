@@ -27,7 +27,7 @@ class Auth extends CI_Controller
 			
 		$this->load->model('akun');
 			
-		$auth = $this->akun->loginAdmin($username, $password);
+		$auth = $this->akun->adminLogin($username, $password);
 			
 		if($auth)
 		{
@@ -44,7 +44,7 @@ class Auth extends CI_Controller
 			
 		$this->load->model('akun');
 			
-		$auth = $this->akun->loginUser($username, $password);
+		$auth = $this->akun->userLogin($username, $password);
 			
 		if($auth)
 		{
