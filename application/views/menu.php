@@ -7,8 +7,10 @@
 <body>
 	<h2>Home</h2>
     <?php
+		/*
 		echo anchor('home/user_signup', 'User Sign Up');
 		echo '<br>';
+		*/
 		echo anchor('home/user_login', 'User Login');
 		echo '<br>';
 		echo anchor('home/admin_login', 'Administrator Login');
