@@ -1,8 +1,7 @@
 <?php
 	
-include('File/X509.php');
-include('Crypt/RSA.php');
-
+include(APPPATH.'/third_party/phpseclib/Crypt/RSA.php');
+include(APPPATH.'/third_party/phpseclib/File/X509.php');
 
 class User extends CI_Controller
 {
@@ -24,12 +23,12 @@ class User extends CI_Controller
 		$this->load->view('user/menu');
 	}
 	
-	function request()
+	function generateCSR()
 	{
 		$this->load->model('country');
 		$data['country'] = $this->country->getCountryList();
 		$this->load->view('user/menu');
-		$this->load->view('user/request', $data);
+		$this->load->view('user/generate', $data);
 	}
 	
 	function generateSN()
@@ -37,7 +36,7 @@ class User extends CI_Controller
 		//generateSN
 	}
 	
-	function submitRequest()
+	function submitData()
 	{
 		$common_name = $this->input->post('common_name');
 		$organization_name = $this->input->post('organization_name');
@@ -64,7 +63,9 @@ class User extends CI_Controller
 		);
 		
 		$this->load->model('request');
-		$this->request->submitRequest($data);
+		$id = $this->request->submitData($data);
+		
+		// Generate CSR
 		$privKey = new Crypt_RSA();
 		extract($privKey->createKey());
 		$privKey->loadKey($privatekey);
@@ -79,15 +80,17 @@ class User extends CI_Controller
 		$x509->setDNProp('id-at-postalCode', $postal_code);
 		$x509->setDNProp('id-at-countryName', $id_country);
 		
-
 		$csr = $x509->signCSR();
-
-		//secho $x509->saveCSR($csr);
+		
 		$filecsr = $x509->saveCSR($csr);
+		
+		$this->load->model('csr');
+		$this->csr->submitCSR($id, $filecsr);
+		
+		/*
 		$myfile = fopen($organization_name.'.txt',"w") or die("Unable to open file!");
 		fwrite($myfile, $filecsr);
 		fclose($myfile);
-
 
 		$file = $organization_name.'.txt';
 
@@ -103,21 +106,88 @@ class User extends CI_Controller
 			readfile($file);
 			exit;
 		}
+		*/
+		
 		$this->index();
 		//echo "Certificate for " . $common_name . ", requested by " . $username;
 	}
 	
-	function download()
+	function request()
+	{
+		$this->load->view('user/menu');
+		$this->load->view('user/request');
+	}
+	
+	function listCSR()
 	{
 		$this->load->model('request');
 		$data['request'] = $this->request->getRequestByUsername($this->session->userdata('username'));
 		$this->load->view('user/menu');
-		$this->load->view('user/download', $data);
+		$this->load->view('user/list_csr', $data);
+	}
+	
+	function downloadCSR($id_request)
+	{
+		$this->load->model('csr');
+		$filedata = $this->csr->getCSR($id_request);
+		
+		foreach($filedata as $temp)
+			$filecsr = $temp->csr;
+		
+		$myfile = fopen($id_request.'.txt',"w") or die("Unable to open file!");
+		fwrite($myfile, $filecsr);
+		fclose($myfile);
+
+		$file = $id_request.'.txt';
+
+		if (file_exists($file)) 
+		{
+			header('Content-Description: File Transfer');
+			header('Content-Type: application/octet-stream');
+			header('Content-Disposition: attachment; filename='.basename($file));
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate');
+			header('Pragma: public');
+			header('Content-Length: ' . filesize($file));
+			readfile($file);
+			exit;
+		}
+	}
+	
+	function listCertificate()
+	{
+		$this->load->model('request');
+		$data['request'] = $this->request->getRequestByUsername($this->session->userdata('username'));
+		$this->load->view('user/menu');
+		$this->load->view('user/list_cert', $data);
 	}
 	
 	function downloadCertificate($id_request)
 	{
-		//download .cert
+		$this->load->model('cert');
+		$filedata = $this->cert->getCert($id_request);
+		
+		foreach($filedata as $temp)
+			$filecert = $temp->cert;
+		
+		$myfile = fopen($id_request.'.cert',"w") or die("Unable to open file!");
+		fwrite($myfile, $filecert);
+		fclose($myfile);
+
+		$file = $id_request.'.cert';
+
+		if (file_exists($file)) 
+		{
+			header('Content-Description: File Transfer');
+			header('Content-Type: application/octet-stream');
+			header('Content-Disposition: attachment; filename='.basename($file));
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate');
+			header('Pragma: public');
+			header('Content-Length: ' . filesize($file));
+			readfile($file);
+			exit;
+		}
 	}
 }
 

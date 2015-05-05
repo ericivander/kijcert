@@ -2,9 +2,11 @@
 
 class Request extends CI_Model
 {
-	public function submitRequest($data)
+	public function submitData($data)
 	{
 		$this->db->insert('request', $data);
+		$id = $this->db->insert_id();
+		return $id;
 	}
 	
 	public function getRequest()
